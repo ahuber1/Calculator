@@ -9,17 +9,33 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    
+    let brain = CalculatorBrain()
+    
+    @IBOutlet weak var calculatorLabel: UILabel!
+    
+    @IBAction func digitPressed(_ sender: UIButton) {
+        brain.giveDigit(digit: sender.titleLabel!.text!)
+        calculatorLabel.text = brain.displayContents
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    @IBAction func binaryOperatorPressed(_ sender: UIButton) {
+        brain.giveBinaryOperator(op: sender.titleLabel!.text!)
+        calculatorLabel.text = brain.displayContents
     }
-
-
+    
+    @IBAction func unaryOperatorPressed(_ sender: UIButton) {
+        brain.giveUnaryOperator(op: sender.titleLabel!.text!)
+        calculatorLabel.text = brain.displayContents
+    }
+    
+    @IBAction func clearPressed(_ sender: UIButton) {
+        brain.clear()
+        calculatorLabel.text = brain.displayContents
+    }
+    
+    @IBAction func equalsPressed(_ sender: UIButton) {
+        brain.evaluate()
+        calculatorLabel.text = brain.displayContents
+    }
 }
-

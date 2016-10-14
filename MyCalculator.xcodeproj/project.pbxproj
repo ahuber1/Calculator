@@ -7,20 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1AB6D5931DA38E7D00F1D827 /* CalculatorBrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB6D5921DA38E7D00F1D827 /* CalculatorBrain.swift */; };
+		1AD49A221DA841B500CA9796 /* InsetLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AD49A211DA841B500CA9796 /* InsetLabel.swift */; };
 		1AFCF72F1DA30F0200BF85AC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */; };
 		1AFCF7311DA30F0200BF85AC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AFCF7301DA30F0200BF85AC /* ViewController.swift */; };
 		1AFCF7341DA30F0200BF85AC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1AFCF7321DA30F0200BF85AC /* Main.storyboard */; };
 		1AFCF7361DA30F0300BF85AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AFCF7351DA30F0300BF85AC /* Assets.xcassets */; };
-		1AFCF7391DA30F0400BF85AC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1AFCF7371DA30F0400BF85AC /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1AB6D5921DA38E7D00F1D827 /* CalculatorBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorBrain.swift; sourceTree = "<group>"; };
+		1AD49A211DA841B500CA9796 /* InsetLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InsetLabel.swift; path = MyCalculator/InsetLabel.swift; sourceTree = "<group>"; };
 		1AFCF72B1DA30F0100BF85AC /* MyCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1AFCF7301DA30F0200BF85AC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		1AFCF7331DA30F0200BF85AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1AFCF7351DA30F0300BF85AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		1AFCF7381DA30F0400BF85AC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1AFCF73A1DA30F0400BF85AC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -38,6 +40,7 @@
 		1AFCF7221DA30EF400BF85AC = {
 			isa = PBXGroup;
 			children = (
+				1AD49A211DA841B500CA9796 /* InsetLabel.swift */,
 				1AFCF72D1DA30F0200BF85AC /* MyCalculator */,
 				1AFCF72C1DA30F0100BF85AC /* Products */,
 			);
@@ -57,8 +60,8 @@
 				1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */,
 				1AFCF7301DA30F0200BF85AC /* ViewController.swift */,
 				1AFCF7321DA30F0200BF85AC /* Main.storyboard */,
+				1AB6D5921DA38E7D00F1D827 /* CalculatorBrain.swift */,
 				1AFCF7351DA30F0300BF85AC /* Assets.xcassets */,
-				1AFCF7371DA30F0400BF85AC /* LaunchScreen.storyboard */,
 				1AFCF73A1DA30F0400BF85AC /* Info.plist */,
 			);
 			path = MyCalculator;
@@ -124,7 +127,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1AFCF7391DA30F0400BF85AC /* LaunchScreen.storyboard in Resources */,
 				1AFCF7361DA30F0300BF85AC /* Assets.xcassets in Resources */,
 				1AFCF7341DA30F0200BF85AC /* Main.storyboard in Resources */,
 			);
@@ -137,7 +139,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1AB6D5931DA38E7D00F1D827 /* CalculatorBrain.swift in Sources */,
 				1AFCF7311DA30F0200BF85AC /* ViewController.swift in Sources */,
+				1AD49A221DA841B500CA9796 /* InsetLabel.swift in Sources */,
 				1AFCF72F1DA30F0200BF85AC /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,14 +155,6 @@
 				1AFCF7331DA30F0200BF85AC /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		1AFCF7371DA30F0400BF85AC /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				1AFCF7381DA30F0400BF85AC /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -302,6 +298,7 @@
 				1AFCF73F1DA30F0400BF85AC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
