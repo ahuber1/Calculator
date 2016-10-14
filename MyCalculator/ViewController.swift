@@ -10,32 +10,73 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    let brain = CalculatorBrain()
+    // The CalculatorBrain object (the model in our MVC)
+    private let brain = CalculatorBrain()
     
-    @IBOutlet weak var calculatorLabel: UILabel!
+    /**  The calculator's display.*/
+    @IBOutlet weak var calculatorDisplay: UILabel!
     
-    @IBAction func digitPressed(_ sender: UIButton) {
-        brain.giveDigit(digit: sender.titleLabel!.text!)
-        calculatorLabel.text = brain.displayContents
+    /** 
+        Called whenever the user presses a button with a digit or decimal point on it.
+        
+        - Parameter sender: The UIButton that the user pressed.
+    */
+    @IBAction func digitOrDecimalPointPressed(_ sender: UIButton) {
+        brain.giveDigitOrDecimalPoint(sender.titleLabel!.text!)
+        calculatorDisplay.text = brain.displayContents
     }
     
+    /** 
+        Called whenever the user presses a button for a binary operator. Currently,
+        those buttons are "+", "–", "×", and "÷".
+     
+        - Parameter sender: The UIButton that the user pressed.
+    */
     @IBAction func binaryOperatorPressed(_ sender: UIButton) {
-        brain.giveBinaryOperator(op: sender.titleLabel!.text!)
-        calculatorLabel.text = brain.displayContents
+        do {
+            try brain.giveBinaryOperator(sender.titleLabel!.text!)
+            calculatorDisplay.text = brain.displayContents
+        } catch CalculatorBrain.CalculatorBrainError.InvalidParameter(let param) {
+            print("Invalid parameter sent to giveBinaryOperator(String) of \"\(param)\"")
+        } catch {
+            print("Exception of unkown type was thrown by giveBinaryOperator(String)")
+        }
     }
     
+    /**
+        Called whenever the user presses a button for a unary operator. Currently, 
+        those buttons are "+/–" and "%".
+     
+        - Parameter sender: The UIButton that the user pressed.
+    */
     @IBAction func unaryOperatorPressed(_ sender: UIButton) {
-        brain.giveUnaryOperator(op: sender.titleLabel!.text!)
-        calculatorLabel.text = brain.displayContents
+        do {
+            try brain.giveUnaryOperator(sender.titleLabel!.text!)
+            calculatorDisplay.text = brain.displayContents
+        } catch CalculatorBrain.CalculatorBrainError.InvalidParameter(let param) {
+            print("Invalid parameter sent to giveUnaryOperator(String) of \"\(param)\"")
+        } catch {
+            print("Exception of unknown type was thrown by giveUnaryOperator(String)")
+        }
     }
     
+    /**
+        Called whenever the user presses the "AC" button on the calculator.
+        
+        - Parameter sender: The UIButton that was pressed (the "AC" button)
+    */
     @IBAction func clearPressed(_ sender: UIButton) {
         brain.clear()
-        calculatorLabel.text = brain.displayContents
+        calculatorDisplay.text = brain.displayContents
     }
     
+    /**
+        Called whenever the user presses the "=" button on the calculator.
+        
+        - Parameter sender: The UIButton that was pressed (the "=" button)
+    */
     @IBAction func equalsPressed(_ sender: UIButton) {
         brain.evaluate()
-        calculatorLabel.text = brain.displayContents
+        calculatorDisplay.text = brain.displayContents
     }
 }

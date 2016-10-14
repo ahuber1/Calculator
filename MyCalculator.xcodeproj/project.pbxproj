@@ -17,7 +17,7 @@
 
 /* Begin PBXFileReference section */
 		1AB6D5921DA38E7D00F1D827 /* CalculatorBrain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalculatorBrain.swift; sourceTree = "<group>"; };
-		1AD49A211DA841B500CA9796 /* InsetLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = InsetLabel.swift; path = MyCalculator/InsetLabel.swift; sourceTree = "<group>"; };
+		1AD49A211DA841B500CA9796 /* InsetLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsetLabel.swift; sourceTree = "<group>"; };
 		1AFCF72B1DA30F0100BF85AC /* MyCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1AFCF7301DA30F0200BF85AC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -37,10 +37,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1AD648711DB15E5A00DCB9B9 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */,
+				1AFCF7351DA30F0300BF85AC /* Assets.xcassets */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		1AFCF7221DA30EF400BF85AC = {
 			isa = PBXGroup;
 			children = (
-				1AD49A211DA841B500CA9796 /* InsetLabel.swift */,
 				1AFCF72D1DA30F0200BF85AC /* MyCalculator */,
 				1AFCF72C1DA30F0100BF85AC /* Products */,
 			);
@@ -57,11 +65,11 @@
 		1AFCF72D1DA30F0200BF85AC /* MyCalculator */ = {
 			isa = PBXGroup;
 			children = (
-				1AFCF72E1DA30F0200BF85AC /* AppDelegate.swift */,
+				1AD49A211DA841B500CA9796 /* InsetLabel.swift */,
+				1AD648711DB15E5A00DCB9B9 /* Supporting Files */,
 				1AFCF7301DA30F0200BF85AC /* ViewController.swift */,
 				1AFCF7321DA30F0200BF85AC /* Main.storyboard */,
 				1AB6D5921DA38E7D00F1D827 /* CalculatorBrain.swift */,
-				1AFCF7351DA30F0300BF85AC /* Assets.xcassets */,
 				1AFCF73A1DA30F0400BF85AC /* Info.plist */,
 			);
 			path = MyCalculator;

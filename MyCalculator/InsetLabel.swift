@@ -8,6 +8,10 @@
 
 import UIKit
 
+/** 
+    This is a standard UILabel except there is 12pt padding on the left, right, top, and 
+    bottom
+ */
 class InsetLabel: UILabel {
     let topInset = CGFloat(12.0), bottomInset = CGFloat(12.0), leftInset = CGFloat(12.0), rightInset = CGFloat(12.0)
     
