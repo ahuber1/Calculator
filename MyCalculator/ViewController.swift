@@ -22,8 +22,12 @@ class ViewController: UIViewController {
         - Parameter sender: The UIButton that the user pressed.
     */
     @IBAction func digitOrDecimalPointPressed(_ sender: UIButton) {
-        brain.giveDigitOrDecimalPoint(sender.titleLabel!.text!)
-        calculatorDisplay.text = brain.displayContents
+        do {
+            try brain.giveDigitOrDecimalPoint(sender.titleLabel!.text!)
+            calculatorDisplay.text = try brain.getDisplayContents()
+        } catch {
+            handleError(error, sender: "digitOrDecimalPointPressed(UIButton)")
+        }
     }
     
     /** 
@@ -35,11 +39,9 @@ class ViewController: UIViewController {
     @IBAction func binaryOperatorPressed(_ sender: UIButton) {
         do {
             try brain.giveBinaryOperator(sender.titleLabel!.text!)
-            calculatorDisplay.text = brain.displayContents
-        } catch CalculatorBrain.CalculatorBrainError.InvalidParameter(let param) {
-            print("Invalid parameter sent to giveBinaryOperator(String) of \"\(param)\"")
+            calculatorDisplay.text = try brain.getDisplayContents()
         } catch {
-            print("Exception of unkown type was thrown by giveBinaryOperator(String)")
+            handleError(error, sender: "binaryOperatorPressed(UIButton)")
         }
     }
     
@@ -52,11 +54,9 @@ class ViewController: UIViewController {
     @IBAction func unaryOperatorPressed(_ sender: UIButton) {
         do {
             try brain.giveUnaryOperator(sender.titleLabel!.text!)
-            calculatorDisplay.text = brain.displayContents
-        } catch CalculatorBrain.CalculatorBrainError.InvalidParameter(let param) {
-            print("Invalid parameter sent to giveUnaryOperator(String) of \"\(param)\"")
+            calculatorDisplay.text = try brain.getDisplayContents()
         } catch {
-            print("Exception of unknown type was thrown by giveUnaryOperator(String)")
+            handleError(error, sender: "unaryOperatorPressed(UIButton)")
         }
     }
     
@@ -66,8 +66,12 @@ class ViewController: UIViewController {
         - Parameter sender: The UIButton that was pressed (the "AC" button)
     */
     @IBAction func clearPressed(_ sender: UIButton) {
-        brain.clear()
-        calculatorDisplay.text = brain.displayContents
+        do {
+            brain.clear()
+            calculatorDisplay.text = try brain.getDisplayContents()
+        } catch {
+            handleError(error, sender: "clearPressed(UIButton)")
+        }
     }
     
     /**
@@ -76,7 +80,30 @@ class ViewController: UIViewController {
         - Parameter sender: The UIButton that was pressed (the "=" button)
     */
     @IBAction func equalsPressed(_ sender: UIButton) {
-        brain.evaluate()
-        calculatorDisplay.text = brain.displayContents
+        do {
+            brain.evaluate()
+            calculatorDisplay.text = try brain.getDisplayContents()
+        } catch {
+            handleError(error, sender: "equalsPressed(UIButton)")
+        }
+    }
+    
+    // Handles errors
+    private func handleError(_ error: Error, sender: String) {
+        if let calculatorBrainError = error as? CalculatorBrain.CalculatorBrainError {
+            switch calculatorBrainError {
+            case .InvalidState(let message):
+                print(message)
+            case .InvalidParameter(let param, let message):
+                if let msg = message {
+                    print(msg)
+                } else {
+                    print("Invalid parameter of \(param) when \(sender) was called")
+                }
+            }
+        }
+        else {
+            print(error.localizedDescription)
+        }
     }
 }

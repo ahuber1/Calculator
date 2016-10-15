@@ -3,11 +3,10 @@
 //  MyCalculator
 //
 //  Created by Andrew Huber on 10/4/16.
-//  Copyright © 2016 andrewhuber. All rights reserved.
+//  Copyright © 2016 Andrew Huber. All rights reserved.
 //
 
 import Foundation
-
 
 class CalculatorBrain {
     
@@ -33,9 +32,6 @@ class CalculatorBrain {
     /** The clear button text ("AC") that appears on the calculator */
     static let ac = "AC"
     
-    /** The default text that the calculator should display. This is by default "0" */
-    static var defaultDisplayText = "0"
-    
     /** 
         The "+/–" symbol on the calculator that makes a number negative when positive,
         and positive when negative.
@@ -55,11 +51,26 @@ class CalculatorBrain {
      */
     enum CalculatorBrainError: Error {
         /** Used whenever an invalid parameter is passed into a method. */
-        case InvalidParameter(invalidParameter: String)
+        case InvalidParameter(invalidParameter: AnyObject, withMessage: String?)
+        
+        /** Used whenever the CalculatorBrain is in an invalid state */
+        case InvalidState(message: String)
     }
+    
+    // ------------------------------------------------------------------------------------
+    // START OF CalculatorState
+    // ------------------------------------------------------------------------------------
     
     // Stores state of calculator
     private struct CalculatorState {
+        
+        // Used to determine the value in the CalculatorState that is currently being or should be edited
+        enum Value {
+            case FirstNumber(withStringOf: String?, andDoubleOf: Double?)
+            case SecondNumber(withStringOf: String?, andDoubleOf: Double?)
+            case EvaluatedNumber(withDoubleOf: Double?)
+        }
+        
         var firstNumberAsString: String?
         var secondNumberAsString: String?
         var binaryOperation: ((Double, Double) -> Double)?
@@ -113,6 +124,92 @@ class CalculatorBrain {
             }
         }
         
+        /** Returns the current value being edited or the value that should be edited */
+        var currentValue: Value {
+            if self.evaluatedNumber != nil {
+                return .EvaluatedNumber(withDoubleOf: self.evaluatedNumber)
+            }
+            else if self.binaryOperation != nil {
+                return .SecondNumber(withStringOf: self.secondNumberAsString, andDoubleOf: self.secondNumberAsDouble)
+            }
+            else {
+                return .FirstNumber(withStringOf: self.firstNumberAsString, andDoubleOf: self.firstNumberAsDouble)
+            }
+        }
+        
+        /** "Unraps" currentValue by extracting the String? and Double? from the enums. This is a tuple containing currentValue, and the unrwapped String? and Double? from currentValue */
+        var unwrappedCurrentValue: (Value, String?, Double?) {
+            let value = currentValue
+            switch value {
+            case .FirstNumber(let stringValue, let doubleValue): return (value, stringValue, doubleValue)
+            case .SecondNumber(let stringValue, let doubleValue): return (value, stringValue, doubleValue)
+            case .EvaluatedNumber(let doubleValue): return (value, nil, doubleValue)
+            }
+        }
+        
+        /**
+         Sets a particular value in the CalculatorState
+         
+         - Parameters:
+            - value:    The value that is to be set
+            - to:       The value that `value` should be set to
+        */
+        mutating func setValue(value: Value, to newValue: AnyObject) throws {
+            switch value {
+            case .FirstNumber:
+                if let newVal = newValue as? String {
+                    self.firstNumberAsString = newVal
+                }
+                else if let newVal = newValue as? Double {
+                    self.firstNumberAsDouble = newVal
+                }
+                else {
+                    var message = "\(CalculatorBrain.CalculatorState.Value.FirstNumber) requires a Double or a String, but it is of "
+                    
+                    if let type = newValue.type {
+                        message += "type \(type)"
+                    }
+                    else {
+                        message += "unknown type"
+                    }
+                    
+                    throw CalculatorBrainError.InvalidParameter(invalidParameter: newValue, withMessage: message)
+                }
+            case .SecondNumber:
+                if let newVal = newValue as? String {
+                    self.secondNumberAsString = newVal
+                }
+                else if let newVal = newValue as? Double {
+                    self.secondNumberAsDouble = newVal
+                }
+                else {
+                    var message = "\(CalculatorBrain.CalculatorState.Value.SecondNumber) requires a Double or a String, but it is of "
+                    
+                    if let type = newValue.type {
+                        message += "type \(type)"
+                    }
+                    else {
+                        message += "unknown type"
+                    }
+                }
+                
+            case .EvaluatedNumber:
+                if let newVal = newValue as? Double {
+                    self.evaluatedNumber = newVal
+                }
+                else {
+                    var message = "\(CalculatorBrain.CalculatorState.Value.EvaluatedNumber) requires a Double, but it is of "
+                    
+                    if let type = newValue.type {
+                        message += type
+                    }
+                    else {
+                        message += "unknown type"
+                    }
+                }
+            }
+        }
+        
         /* 
             Sets binaryOperation, firstNumberAsString, secondNumberAsString, and 
             evaluatedNumber to nil, effectively "clearing out" this CalculatorState
@@ -125,51 +222,40 @@ class CalculatorBrain {
         }
     }
     
+    // ------------------------------------------------------------------------------------
+    // END OF CalculatorState
+    // ------------------------------------------------------------------------------------
+    
     // This calculator state
     private var state = CalculatorState()
     
-    /** A get-only property that returns what the calculator display should display */
-    var displayContents: String {
-        /* 
-            This if-else block follows the following pattern:
-         
-                1) If evaluatedNumber does not equal nil (i.e., if the first and second
-                   number have been evaluated), then that is the number that should be
-                   displayed, so return it.
-         
-                2) Otherwise, if secondNumber does not equal nil (i.e., if the user has
-                   entered or is entering the second number), then that is the number that
-                   should be displayed, so return it.
-         
-                3) Otherwise, if firstNumber does not equal nil (i.e., if the user has
-                   entered or is intering the first number), then that is the number that
-                   should be displayed, so return it.
-         
-                4) Otherwise, the default text (CalculatorBrain.defaultDisplayText) should 
-                   be displayed.
-         */
-        if let evaluatedNumber = state.evaluatedNumber {
+    /** 
+     Retrieves the contents that the calculator's display should display
+     
+     - Returns: the contents that the calculator's display should display
+     */
+    func getDisplayContents() throws -> String {
+        let (_, stringValue, doubleValue) = state.unwrappedCurrentValue
+        
+        if let string = stringValue {
+            return string
+        }
+        else if let double = doubleValue {
             // If evaluated number can be represented as an Int,
             // then convert it to an Int and return the Int as a
             // String
-            if floor(evaluatedNumber) == evaluatedNumber {
-                return String(Int(evaluatedNumber))
+            if floor(double) == double {
+                return String(Int(double))
             }
                 
-            // Otherwise, return evaluatedNumber as a String w/o
-            // conversion to Int
+                // Otherwise, return evaluatedNumber as a String w/o
+                // conversion to Int
             else {
-                return String(evaluatedNumber)
+                return String(double)
             }
         }
-        if let second = state.secondNumberAsString {
-            return second
-        }
-        else if let first = state.firstNumberAsString {
-            return first
-        }
         else {
-            return CalculatorBrain.defaultDisplayText
+            throw CalculatorBrainError.InvalidState(message: "Encountered an invalid state when calling displayContent's getter")
         }
     }
     
@@ -179,60 +265,30 @@ class CalculatorBrain {
      
      - Parameter digitOrDecimalPoint: The text on the button
     */
-    func giveDigitOrDecimalPoint(_ digitOrDecimalPoint: String) {
+    func giveDigitOrDecimalPoint(_ digitOrDecimalPoint: String) throws {
+        
+        let validParams = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "." ]
+        
+        if !validParams.contains(digitOrDecimalPoint) {
+            throw CalculatorBrainError.InvalidParameter(invalidParameter: digitOrDecimalPoint as AnyObject, withMessage: nil)
+        }
         
         if state.evaluatedNumber != nil {
-            prepareForNewCalculation()
-            
-            // Undo part of what was done in prepareForNewCalculation() (explanation below)
-            state.firstNumberAsString = nil
-            
-            /*
-             EXPLANATION: prepareForNewCalculation() sets all of the variables in state
-             to nil except for firstNumberAsString, which is set to what was originally
-             in evaluatedNumber BEFORE all the variables in state are set to nil. This
-             needs to be done because if giveDigit(digit: String) is called (i.e., if
-             0–9 or the "." button is pressed) and state.evaluatedNumber is nil, this
-             can only be the case because the user pressed the "AC" button, which means
-             that we need to clear out state.firstNumberAsString so the user can set the
-             first number.
-            */
+            state.clear()
         }
         
-        // If there is no binary operation, then the first number should be set
-        if state.binaryOperation == nil {
-            // The first button the user pressed is not ".", set the display to what the user entered.
-            if state.firstNumberAsString == nil && digitOrDecimalPoint != CalculatorBrain.point {
-                state.firstNumberAsString = "0."
-            }
-            // If the user began to edit the number
-            else if let first = state.firstNumberAsString {
-                state.firstNumberAsString = first + digitOrDecimalPoint
-            }
-            // If the user entered "."
-            else {
-                state.firstNumberAsString = digitOrDecimalPoint
-            }
+        let (value, stringValue, _) = state.unwrappedCurrentValue
+        
+        if let string = stringValue {
+            try state.setValue(value: value, to: (string + digitOrDecimalPoint) as AnyObject)
         }
-        // If there is a binary operation, then the second number should be set
         else {
-            // The first button the user pressed is not ".", set the display to what the user entered.
-            if state.secondNumberAsString == nil && digitOrDecimalPoint != CalculatorBrain.point {
-                state.secondNumberAsString = digitOrDecimalPoint
-            }
-            // If the user began to edit the number
-            else if let second = state.secondNumberAsString {
-                state.secondNumberAsString = second + digitOrDecimalPoint
-            }
-            // If the user entered "."
-            else {
-                state.secondNumberAsString = digitOrDecimalPoint
-            }
+            try state.setValue(value: value, to: digitOrDecimalPoint as AnyObject)
         }
     }
     
     /**
-     Whenever the controller wishes to give the brain a unary operator (thus far, this 
+     Whenever the controller wishes to give the brain a unary operator (thus far, this
      is only "+/–" and "%"), this method should be called. Throws 
      CalculatorBrainError.invalidParameter(parameterFound: String) if an unsupported 
      operator is given.
@@ -241,41 +297,35 @@ class CalculatorBrain {
     */
     func giveUnaryOperator(_ op: String) throws {
         
+        let (value, stringValue, doubleValue) = state.unwrappedCurrentValue
+        
         // if operator is +/-
         if op == CalculatorBrain.plusMinus {
-            if let second = state.secondNumberAsString {
-                if firstCharacterOfString(second) == CalculatorBrain.minusSign {
-                    state.secondNumberAsString = removeFirstCharacterFromString(second)
+            
+            if let string = stringValue {
+                if firstCharacterOfString(string) == CalculatorBrain.minusSign {
+                    try state.setValue(value: value, to: removeFirstCharacterFromString(string) as AnyObject)
                 }
                 else {
-                    state.secondNumberAsString = CalculatorBrain.minusSign + second
+                    try state.setValue(value: value, to: (CalculatorBrain.minusSign + string) as AnyObject)
                 }
             }
-            else if let first = state.firstNumberAsString {
-                if firstCharacterOfString(first) == CalculatorBrain.minusSign {
-                    state.firstNumberAsString = removeFirstCharacterFromString(first)
-                }
-                else {
-                    state.firstNumberAsString = CalculatorBrain.minusSign + first
-                }
+            else if let double = doubleValue {
+                try state.setValue(value: value, to: (double * -1.0) as AnyObject)
             }
         }
             
         // if the operator is %
         else if op == CalculatorBrain.percentSign {
-            if let evaluated = state.evaluatedNumber {
-                state.evaluatedNumber = evaluated / 100.0
-            }
-            else if let second = state.secondNumberAsDouble {
-                state.secondNumberAsDouble = second / 100.0
-            }
-            else if let first = state.firstNumberAsDouble {
-                state.firstNumberAsDouble = first / 100.0
+            if let double = doubleValue {
+                try state.setValue(value: value, to: (double / 100.0) as AnyObject)
+            } else {
+                throw CalculatorBrainError.InvalidState(message: "There is no double value stored in \(value)")
             }
         }
         
         else {
-            throw CalculatorBrainError.InvalidParameter(invalidParameter: op)
+            throw CalculatorBrainError.InvalidParameter(invalidParameter: op as AnyObject, withMessage: nil)
         }
     }
     
@@ -294,7 +344,7 @@ class CalculatorBrain {
         }
         
         if state.evaluatedNumber != nil{
-            prepareForNewCalculation()
+            try prepareForNewCalculation()
         }
         
         switch op {
@@ -302,7 +352,7 @@ class CalculatorBrain {
         case CalculatorBrain.minusSign: state.binaryOperation = { $0 - $1 }
         case CalculatorBrain.multiplicationSign: state.binaryOperation = { $0 * $1 }
         case CalculatorBrain.divisionSign: state.binaryOperation = { $0 / $1 }
-        default: throw CalculatorBrainError.InvalidParameter(invalidParameter: op)
+        default: throw CalculatorBrainError.InvalidParameter(invalidParameter: op as AnyObject, withMessage: nil)
         }
     }
     
@@ -341,8 +391,8 @@ class CalculatorBrain {
     
     // Clears out state, but sets state's firstNumberAsString to the CURRENT 
     // displayContents
-    private func prepareForNewCalculation() {
-        let oldDisplayContents = displayContents
+    private func prepareForNewCalculation() throws {
+        let oldDisplayContents = try getDisplayContents()
         state.clear()
         state.firstNumberAsString = oldDisplayContents
     }
